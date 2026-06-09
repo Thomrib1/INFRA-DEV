@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Ymmo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Header minimal -->
+  <header class="header" id="header" style="position:fixed">
+    <div class="header__inner container">
+      <a href="index.html" class="logo">
+        <span class="logo__mark">Y</span>
+        <span class="logo__text">mmo</span>
+      </a>
+      <div style="margin-left:auto;display:flex;gap:12px;align-items:center">
+        <span id="headerUserName" style="font-size:0.88rem;color:var(--gray-600);font-weight:500"></span>
+        <button class="btn btn--ghost btn--sm" onclick="logout()">Déconnexion</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="dashboard-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar__user">
+        <div class="sidebar__avatar" id="sidebarAvatar">?</div>
+        <div class="sidebar__name" id="sidebarName">Chargement…</div>
+        <div class="sidebar__role" id="sidebarRole">agent</div>
+      </div>
+      <nav class="sidebar__nav">
+        <a href="#" class="sidebar__link active" onclick="showSection('properties')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/></svg>
+          Mes biens
+        </a>
+        <a href="#" class="sidebar__link" onclick="showSection('add')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          Ajouter un bien
+        </a>
+        <a href="catalogue.html" class="sidebar__link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Catalogue public
+        </a>
+        <a href="agences.html" class="sidebar__link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
+          Agences
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Contenu principal -->
+    <main class="main-content">
+
+      <!-- Section : Mes biens -->
+      <div id="section-properties">
+        <div class="dashboard-header">
+          <h1>Mes biens</h1>
+          <p>Biens publiés par votre agence</p>
+        </div>
+
+        <!-- KPIs -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-card__label">Total biens</div>
+            <div class="kpi-card__value" id="kpiTotal">—</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-card__label">Disponibles</div>
+            <div class="kpi-card__value" id="kpiAvailable">—</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-card__label">En vente</div>
+            <div class="kpi-card__value" id="kpiSale">—</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-card__label">En location</div>
+            <div class="kpi-card__value" id="kpiRent">—</div>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="dashboard-card">
+          <div class="dashboard-card__header">
+            <span class="dashboard-card__title">Liste des biens</span>
+            <button class="btn btn--primary btn--sm" onclick="showSection('add')">+ Ajouter</button>
+          </div>
+          <div id="propertiesTableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Titre</th>
+                  <th>Ville</th>
+                  <th>Type</th>
+                  <th>Transaction</th>
+                  <th>Prix</th>
+                  <th>Surface</th>
+                  <th>Statut</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="propertiesTableBody">
+                <tr><td colspan="8" style="text-align:center;color:var(--gray-400);padding:32px">Chargement…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section : Ajouter un bien -->
+      <div id="section-add" style="display:none">
+        <div class="dashboard-header">
+          <h1>Ajouter un bien</h1>
+          <p>Publier un nouveau bien sur la plateforme Ymmo</p>
+        </div>
+
+        <div class="dashboard-card" style="max-width:640px">
+          <div class="dashboard-card__header">
+            <span class="dashboard-card__title">Informations du bien</span>
+          </div>
+          <div style="padding:24px">
+            <div class="alert alert--error" id="addError"></div>
+            <div class="alert alert--success" id="addSuccess"></div>
+
+            <div class="form-group">
+              <label>Titre *</label>
+              <input type="text" id="fTitle" placeholder="ex: Appartement T3 lumineux centre-ville" />
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <textarea id="fDesc" rows="3" placeholder="Description détaillée du bien…"></textarea>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+              <div class="form-group">
+                <label>Ville *</label>
+                <input type="text" id="fCity" placeholder="ex: Lyon" />
+              </div>
+              <div class="form-group">
+                <label>Type de bien *</label>
+                <select id="fType">
+                  <option value="">Choisir…</option>
+                  <option value="house">Maison</option>
+                  <option value="apartment">Appartement</option>
+                  <option value="office">Bureau</option>
+                </select>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+              <div class="form-group">
+                <label>Transaction *</label>
+                <select id="fTransaction">
+                  <option value="">Choisir…</option>
+                  <option value="sale">Vente</option>
+                  <option value="rent">Location</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Prix (€) *</label>
+                <input type="number" id="fPrice" placeholder="ex: 250000" min="0" />
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+              <div class="form-group">
+                <label>Surface (m²) *</label>
+                <input type="number" id="fSurface" placeholder="ex: 75" min="0" />
+              </div>
+              <div class="form-group">
+                <label>Pièces</label>
+                <input type="number" id="fRooms" placeholder="ex: 4" min="0" />
+              </div>
+              <div class="form-group">
+                <label>Chambres</label>
+                <input type="number" id="fBedrooms" placeholder="ex: 2" min="0" />
+              </div>
+            </div>
+            <div style="display:flex;gap:12px;margin-top:8px">
+              <button class="btn btn--primary" id="addSubmit" onclick="handleAddProperty()">Publier le bien</button>
+              <button class="btn btn--ghost" onclick="showSection('properties')">Annuler</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="api.js"></script>
+  <script src="components.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>

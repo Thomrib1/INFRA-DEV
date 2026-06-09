@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ymmo — Groupe Immobilier</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ─── HEADER ─── -->
+  <header class="header" id="header">
+    <div class="header__inner container">
+      <a href="index.html" class="logo">
+        <span class="logo__mark">Y</span>
+        <span class="logo__text">mmo</span>
+      </a>
+      <nav class="nav">
+        <a href="index.html" class="nav__link nav__link--active">Accueil</a>
+        <a href="catalogue.html" class="nav__link">Biens</a>
+        <a href="agences.html" class="nav__link">Agences</a>
+        <a href="#contact" class="nav__link">Contact</a>
+      </nav>
+      <div class="header__actions">
+        <a href="login.html" class="btn btn--ghost" id="loginBtn">Connexion</a>
+        <a href="dashboard.html" class="btn btn--primary hidden" id="dashboardBtn">Mon espace</a>
+      </div>
+      <button class="burger" id="burger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="nav-mobile" id="navMobile">
+      <a href="index.html" class="nav__link">Accueil</a>
+      <a href="catalogue.html" class="nav__link">Biens</a>
+      <a href="agences.html" class="nav__link">Agences</a>
+      <a href="#contact" class="nav__link">Contact</a>
+      <a href="login.html" class="btn btn--primary" id="loginBtnMobile">Connexion</a>
+    </div>
+  </header>
+
+  <!-- ─── HERO ─── -->
+  <section class="hero">
+    <div class="hero__bg">
+      <div class="hero__overlay"></div>
+      <!-- Image SVG décorative -->
+      <svg class="hero__shape" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="650" cy="120" r="320" fill="rgba(200,169,110,0.07)"/>
+        <circle cx="700" cy="80" r="180" fill="rgba(200,169,110,0.05)"/>
+      </svg>
+    </div>
+    <div class="container hero__content">
+      <div class="hero__eyebrow">Groupe Immobilier · 12 agences en France</div>
+      <h1 class="hero__title">
+        Trouver votre bien,<br />
+        <em>partout en France.</em>
+      </h1>
+      <p class="hero__subtitle">Résidentiel, professionnel, vente ou location — Ymmo vous accompagne de la recherche à la signature.</p>
+
+      <!-- Barre de recherche rapide -->
+      <div class="search-bar">
+        <div class="search-bar__field">
+          <label for="searchCity">Ville</label>
+          <input type="text" id="searchCity" placeholder="Paris, Lyon, Marseille…" />
+        </div>
+        <div class="search-bar__field">
+          <label for="searchType">Type</label>
+          <select id="searchType">
+            <option value="">Tous</option>
+            <option value="house">Maison</option>
+            <option value="apartment">Appartement</option>
+            <option value="office">Bureau</option>
+          </select>
+        </div>
+        <div class="search-bar__field">
+          <label for="searchTransaction">Transaction</label>
+          <select id="searchTransaction">
+            <option value="">Vente & Location</option>
+            <option value="sale">Achat</option>
+            <option value="rent">Location</option>
+          </select>
+        </div>
+        <button class="btn btn--primary search-bar__btn" onclick="doSearch()">Rechercher</button>
+      </div>
+    </div>
+
+    <!-- Ticker des villes -->
+    <div class="ticker">
+      <div class="ticker__track">
+        <span>Aix-en-Provence</span><span class="ticker__dot">·</span>
+        <span>Paris</span><span class="ticker__dot">·</span>
+        <span>Lyon</span><span class="ticker__dot">·</span>
+        <span>Bordeaux</span><span class="ticker__dot">·</span>
+        <span>Marseille</span><span class="ticker__dot">·</span>
+        <span>Nice</span><span class="ticker__dot">·</span>
+        <span>Nantes</span><span class="ticker__dot">·</span>
+        <span>Toulouse</span><span class="ticker__dot">·</span>
+        <span>Strasbourg</span><span class="ticker__dot">·</span>
+        <span>Montpellier</span><span class="ticker__dot">·</span>
+        <span>Rennes</span><span class="ticker__dot">·</span>
+        <span>Lille</span><span class="ticker__dot">·</span>
+        <!-- doublon pour boucle infinie -->
+        <span>Aix-en-Provence</span><span class="ticker__dot">·</span>
+        <span>Paris</span><span class="ticker__dot">·</span>
+        <span>Lyon</span><span class="ticker__dot">·</span>
+        <span>Bordeaux</span><span class="ticker__dot">·</span>
+        <span>Marseille</span><span class="ticker__dot">·</span>
+        <span>Nice</span><span class="ticker__dot">·</span>
+        <span>Nantes</span><span class="ticker__dot">·</span>
+        <span>Toulouse</span><span class="ticker__dot">·</span>
+        <span>Strasbourg</span><span class="ticker__dot">·</span>
+        <span>Montpellier</span><span class="ticker__dot">·</span>
+        <span>Rennes</span><span class="ticker__dot">·</span>
+        <span>Lille</span><span class="ticker__dot">·</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── STATS ─── -->
+  <section class="stats container">
+    <div class="stat">
+      <span class="stat__number" data-target="12">0</span>
+      <span class="stat__label">Agences en France</span>
+    </div>
+    <div class="stat">
+      <span class="stat__number" data-target="850">0</span>
+      <span class="stat__label">Biens disponibles</span>
+    </div>
+    <div class="stat">
+      <span class="stat__number" data-target="3200">0</span>
+      <span class="stat__label">Transactions réalisées</span>
+    </div>
+    <div class="stat">
+      <span class="stat__number" data-target="98">0</span>
+      <span class="stat__label">% clients satisfaits</span>
+    </div>
+  </section>
+
+  <!-- ─── BIENS EN VEDETTE ─── -->
+  <section class="section">
+    <div class="container">
+      <div class="section__header">
+        <div class="section__eyebrow">Sélection du moment</div>
+        <h2 class="section__title">Biens en vedette</h2>
+        <a href="catalogue.html" class="section__link">Voir tous les biens →</a>
+      </div>
+      <div class="properties-grid" id="featuredProperties">
+        <!-- Rempli dynamiquement -->
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── SERVICES ─── -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__header">
+        <div class="section__eyebrow">Notre expertise</div>
+        <h2 class="section__title">Un accompagnement complet</h2>
+      </div>
+      <div class="services-grid">
+        <div class="service-card">
+          <div class="service-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
+          </div>
+          <h3>Résidentiel</h3>
+          <p>Maisons, appartements, villas — trouvez votre logement idéal dans tout le réseau Ymmo.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="1"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+          </div>
+          <h3>Professionnel</h3>
+          <p>Bureaux, locaux commerciaux et entrepôts. Solutions sur mesure pour les entreprises.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          </div>
+          <h3>Analyse de marché</h3>
+          <p>Intelligence immobilière basée sur les données : tendances, prévisions, zones à fort potentiel.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          </div>
+          <h3>Conseil dédié</h3>
+          <p>Un agent Ymmo attitré vous accompagne à chaque étape, de la visite à la signature.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── AGENCES (aperçu) ─── -->
+  <section class="section">
+    <div class="container">
+      <div class="section__header">
+        <div class="section__eyebrow">Notre réseau</div>
+        <h2 class="section__title">Nos agences</h2>
+        <a href="agences.html" class="section__link">Voir toutes les agences →</a>
+      </div>
+      <div class="agencies-preview" id="agenciesPreview">
+        <div class="skeleton-card skeleton-card--sm"></div>
+        <div class="skeleton-card skeleton-card--sm"></div>
+        <div class="skeleton-card skeleton-card--sm"></div>
+        <div class="skeleton-card skeleton-card--sm"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── CONTACT ─── -->
+  <section class="section section--dark" id="contact">
+    <div class="container contact-split">
+      <div class="contact-split__info">
+        <div class="section__eyebrow section__eyebrow--light">Nous contacter</div>
+        <h2 class="section__title section__title--light">Une question ?<br />Parlons-en.</h2>
+        <p class="contact-split__text">Notre équipe est disponible du lundi au vendredi, de 9h à 18h. Vous pouvez aussi passer directement dans l'une de nos 12 agences.</p>
+        <div class="contact-split__meta">
+          <div class="contact-meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>Siège social — Aix-en-Provence</span>
+          </div>
+          <div class="contact-meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.5 11.5a19.79 19.79 0 01-3-8.59A2 2 0 013.68 1h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+            <span>+33 4 42 XX XX XX</span>
+          </div>
+          <div class="contact-meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <span>contact@ymmo.fr</span>
+          </div>
+        </div>
+      </div>
+      <div class="contact-split__form">
+        <div class="form-card" id="contactForm">
+          <div class="form-group">
+            <label for="cName">Nom complet</label>
+            <input type="text" id="cName" placeholder="Jean Dupont" />
+          </div>
+          <div class="form-group">
+            <label for="cEmail">Email</label>
+            <input type="email" id="cEmail" placeholder="jean@example.com" />
+          </div>
+          <div class="form-group">
+            <label for="cPhone">Téléphone</label>
+            <input type="tel" id="cPhone" placeholder="+33 6 XX XX XX XX" />
+          </div>
+          <div class="form-group">
+            <label for="cMessage">Message</label>
+            <textarea id="cMessage" rows="4" placeholder="Décrivez votre projet immobilier…"></textarea>
+          </div>
+          <button class="btn btn--gold btn--full" onclick="submitContact()">Envoyer le message</button>
+          <p class="form-notice" id="contactNotice"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ─── -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <a href="index.html" class="logo logo--light">
+          <span class="logo__mark">Y</span>
+          <span class="logo__text">mmo</span>
+        </a>
+        <p>Votre partenaire immobilier en France depuis 2004. 12 agences, une seule promesse.</p>
+      </div>
+      <div class="footer__links">
+        <div class="footer__col">
+          <h4>Navigation</h4>
+          <a href="index.html">Accueil</a>
+          <a href="catalogue.html">Catalogue</a>
+          <a href="agences.html">Agences</a>
+        </div>
+        <div class="footer__col">
+          <h4>Espace pro</h4>
+          <a href="login.html">Connexion</a>
+          <a href="dashboard.html">Dashboard agent</a>
+        </div>
+        <div class="footer__col">
+          <h4>Légal</h4>
+          <a href="#">Mentions légales</a>
+          <a href="#">Politique de confidentialité</a>
+          <a href="#">CGU</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer__bottom container">
+      <span>© 2025 Ymmo Groupe Immobilier · Tous droits réservés</span>
+    </div>
+  </footer>
+
+  <script src="api.js"></script>
+  <script src="components.js"></script>
+  <script src="index.js"></script>
+</body>
+</html>
