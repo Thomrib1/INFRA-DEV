@@ -7,6 +7,9 @@ require('dotenv').config();
 const app = express();
 app.use(express.json()); // permet au serveur de comprendre le format JSON
 
+const cors = require('cors');
+app.use(cors({ origin: '*' }));
+
 // connexion à la base de données
 const db = mysql.createPool({
     host: process.env.DB_HOST,
