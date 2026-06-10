@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Administration — Ymmo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .admin-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: linear-gradient(135deg, #C8A96E, #D9BE8E);
+      color: #1A2744; padding: 4px 12px; border-radius: 20px;
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .danger-btn {
+      background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA;
+      padding: 4px 10px; border-radius: 4px; font-size: 0.75rem;
+      font-weight: 700; cursor: pointer; transition: all 0.2s;
+    }
+    .danger-btn:hover { background: #DC2626; color: white; }
+    .role-btn {
+      background: #EDE9FE; color: #7C3AED; border: 1px solid #DDD6FE;
+      padding: 4px 10px; border-radius: 4px; font-size: 0.75rem;
+      font-weight: 700; cursor: pointer; transition: all 0.2s; margin-right: 4px;
+    }
+    .role-btn:hover { background: #7C3AED; color: white; }
+    .kpi-card--gold { border-top: 3px solid var(--gold); }
+    .kpi-card--navy { border-top: 3px solid var(--navy); }
+    .kpi-card--green { border-top: 3px solid #10B981; }
+    .kpi-card--purple { border-top: 3px solid #7C3AED; }
+    .section-tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+    .tab-btn {
+      padding: 8px 20px; border-radius: 6px; font-size: 0.88rem;
+      font-weight: 600; cursor: pointer; border: 1.5px solid var(--gray-200);
+      background: var(--white); color: var(--gray-600); transition: all 0.2s;
+    }
+    .tab-btn.active { background: var(--navy); color: white; border-color: var(--navy); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .confirm-overlay {
+      position: fixed; inset: 0; background: rgba(26,39,68,0.6);
+      z-index: 300; display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    .confirm-overlay.open { opacity: 1; pointer-events: all; }
+    .confirm-box {
+      background: white; border-radius: 12px; padding: 28px 32px;
+      max-width: 400px; width: 100%; box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+      transform: translateY(12px); transition: transform 0.2s;
+    }
+    .confirm-overlay.open .confirm-box { transform: translateY(0); }
+    .confirm-box h3 { font-family: var(--font-display); color: var(--navy); margin-bottom: 10px; }
+    .confirm-box p { font-size: 0.9rem; color: var(--gray-600); margin-bottom: 20px; }
+    .confirm-box__actions { display: flex; gap: 10px; justify-content: flex-end; }
+    .valuation { font-size: 0.75rem; color: var(--gray-400); margin-top: 4px; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header" id="header" style="position:fixed">
+    <div class="header__inner container">
+      <a href="index.html" class="logo">
+        <span class="logo__mark">Y</span>
+        <span class="logo__text">mmo</span>
+      </a>
+      <div style="margin-left:16px">
+        <span class="admin-badge">⚙ Administration</span>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:12px;align-items:center">
+        <span id="headerUserName" style="font-size:0.88rem;color:var(--gray-600);font-weight:500"></span>
+        <a href="dashboard.html" class="btn btn--ghost btn--sm">Dashboard agent</a>
+        <button class="btn btn--ghost btn--sm" onclick="logout()">Déconnexion</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Layout -->
+  <div class="dashboard-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar__user">
+        <div class="sidebar__avatar" id="sidebarAvatar" style="background:var(--gold)">A</div>
+        <div class="sidebar__name" id="sidebarName">Admin</div>
+        <div class="sidebar__role">Administrateur</div>
+      </div>
+      <nav class="sidebar__nav">
+        <a href="#" class="sidebar__link active" onclick="switchTab('dashboard')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Vue d'ensemble
+        </a>
+        <a href="#" class="sidebar__link" onclick="switchTab('users')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          Utilisateurs
+        </a>
+        <a href="#" class="sidebar__link" onclick="switchTab('properties')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/></svg>
+          Tous les biens
+        </a>
+        <a href="#" class="sidebar__link" onclick="switchTab('agencies')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
+          Agences
+        </a>
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,0.08);margin:12px 0"/>
+        <a href="index.html" class="sidebar__link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          Site public
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Contenu -->
+    <main class="main-content">
+
+      <!-- ── TAB : VUE D'ENSEMBLE ── -->
+      <div id="tab-dashboard" class="tab-content active">
+        <div class="dashboard-header">
+          <h1>Vue d'ensemble</h1>
+          <p>Tableau de bord administrateur — Ymmo Groupe Immobilier</p>
+        </div>
+        <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:28px">
+          <div class="kpi-card kpi-card--navy">
+            <div class="kpi-card__label">Utilisateurs</div>
+            <div class="kpi-card__value" id="statUsers">—</div>
+            <div class="kpi-card__sub" id="statAdmins"></div>
+          </div>
+          <div class="kpi-card kpi-card--gold">
+            <div class="kpi-card__label">Agences</div>
+            <div class="kpi-card__value" id="statAgencies">—</div>
+            <div class="kpi-card__sub">réseau national</div>
+          </div>
+          <div class="kpi-card kpi-card--green">
+            <div class="kpi-card__label">Biens disponibles</div>
+            <div class="kpi-card__value" id="statAvailable">—</div>
+            <div class="kpi-card__sub" id="statTotal"></div>
+          </div>
+          <div class="kpi-card kpi-card--purple">
+            <div class="kpi-card__label">Biens vendus</div>
+            <div class="kpi-card__value" id="statSold">—</div>
+            <div class="kpi-card__sub valuation" id="statValuation"></div>
+          </div>
+        </div>
+
+        <!-- Résumé rapide -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+          <div class="dashboard-card">
+            <div class="dashboard-card__header">
+              <span class="dashboard-card__title">Derniers utilisateurs</span>
+              <button class="btn btn--primary btn--sm" onclick="switchTab('users')">Voir tout</button>
+            </div>
+            <table>
+              <thead><tr><th>Nom</th><th>Email</th><th>Rôle</th></tr></thead>
+              <tbody id="recentUsers"><tr><td colspan="3" style="text-align:center;color:var(--gray-400);padding:20px">Chargement…</td></tr></tbody>
+            </table>
+          </div>
+          <div class="dashboard-card">
+            <div class="dashboard-card__header">
+              <span class="dashboard-card__title">Derniers biens</span>
+              <button class="btn btn--primary btn--sm" onclick="switchTab('properties')">Voir tout</button>
+            </div>
+            <table>
+              <thead><tr><th>Titre</th><th>Ville</th><th>Statut</th></tr></thead>
+              <tbody id="recentProperties"><tr><td colspan="3" style="text-align:center;color:var(--gray-400);padding:20px">Chargement…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TAB : UTILISATEURS ── -->
+      <div id="tab-users" class="tab-content">
+        <div class="dashboard-header">
+          <h1>Gestion des utilisateurs</h1>
+          <p>Tous les comptes enregistrés sur la plateforme</p>
+        </div>
+        <div class="dashboard-card">
+          <div class="dashboard-card__header">
+            <span class="dashboard-card__title" id="usersCount">Utilisateurs</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th><th>Nom</th><th>Email</th><th>Rôle</th><th>Agence</th><th>Créé le</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <tr><td colspan="7" style="text-align:center;color:var(--gray-400);padding:32px">Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── TAB : BIENS ── -->
+      <div id="tab-properties" class="tab-content">
+        <div class="dashboard-header">
+          <h1>Gestion des biens</h1>
+          <p>Tous les biens immobiliers — tous statuts confondus</p>
+        </div>
+        <div class="dashboard-card">
+          <div class="dashboard-card__header">
+            <span class="dashboard-card__title" id="propertiesCount">Biens</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th><th>Titre</th><th>Ville</th><th>Type</th><th>Transaction</th><th>Prix</th><th>Agence</th><th>Statut</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="propertiesTableBody">
+              <tr><td colspan="9" style="text-align:center;color:var(--gray-400);padding:32px">Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── TAB : AGENCES ── -->
+      <div id="tab-agencies" class="tab-content">
+        <div class="dashboard-header">
+          <h1>Gestion des agences</h1>
+          <p>Réseau des 12 agences Ymmo</p>
+        </div>
+
+        <!-- Formulaire ajout agence -->
+        <div class="dashboard-card" style="margin-bottom:24px">
+          <div class="dashboard-card__header">
+            <span class="dashboard-card__title">Ajouter une agence</span>
+          </div>
+          <div style="padding:20px 24px">
+            <div class="alert alert--error" id="agencyError"></div>
+            <div class="alert alert--success" id="agencySuccess"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+              <div class="form-group"><label>Nom *</label><input type="text" id="aName" placeholder="Ymmo Lyon" /></div>
+              <div class="form-group"><label>Ville *</label><input type="text" id="aCity" placeholder="Lyon" /></div>
+              <div class="form-group"><label>Adresse</label><input type="text" id="aAddress" placeholder="3 Place Bellecour" /></div>
+              <div class="form-group"><label>Téléphone</label><input type="tel" id="aPhone" placeholder="04 72 00 00 00" /></div>
+              <div class="form-group"><label>Email</label><input type="email" id="aEmail" placeholder="lyon@ymmo.fr" /></div>
+            </div>
+            <button class="btn btn--primary" id="agencySubmit" onclick="handleAddAgency()">Créer l'agence</button>
+          </div>
+        </div>
+
+        <div class="dashboard-card">
+          <div class="dashboard-card__header">
+            <span class="dashboard-card__title" id="agenciesCount">Agences</span>
+          </div>
+          <table>
+            <thead>
+              <tr><th>ID</th><th>Nom</th><th>Ville</th><th>Adresse</th><th>Téléphone</th><th>Email</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="agenciesTableBody">
+              <tr><td colspan="7" style="text-align:center;color:var(--gray-400);padding:32px">Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Confirm dialog -->
+  <div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-box">
+      <h3 id="confirmTitle">Confirmer la suppression</h3>
+      <p id="confirmText">Cette action est irréversible.</p>
+      <div class="confirm-box__actions">
+        <button class="btn btn--ghost" onclick="closeConfirm()">Annuler</button>
+        <button class="btn btn--primary" id="confirmBtn" style="background:#DC2626">Supprimer</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="api.js"></script>
+  <script src="components.js"></script>
+  <script>
+    // ─── AUTH GUARD ───
+    if (!Auth.isLoggedIn()) window.location.href = 'login.html';
+    const user = Auth.getUser();
+    if (user && user.role !== 'admin') window.location.href = 'dashboard.html';
+
+    const token = Auth.getToken();
+
+    // ─── INIT ───
+    document.addEventListener('DOMContentLoaded', () => {
+      if (user) {
+        document.getElementById('headerUserName').textContent = `${user.first_name} ${user.last_name}`;
+        document.getElementById('sidebarName').textContent = `${user.first_name} ${user.last_name}`;
+        document.getElementById('sidebarAvatar').textContent = user.first_name.charAt(0).toUpperCase();
+      }
+      loadStats();
+      loadUsers();
+      loadAllProperties();
+      loadAgencies();
+    });
+
+    // ─── TABS ───
+    function switchTab(name) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.sidebar__link').forEach(l => l.classList.remove('active'));
+      document.getElementById(`tab-${name}`).classList.add('active');
+      const links = document.querySelectorAll('.sidebar__link');
+      const map = { dashboard: 0, users: 1, properties: 2, agencies: 3 };
+      if (map[name] !== undefined) links[map[name]].classList.add('active');
+      return false;
+    }
+
+    // ─── CONFIRM DIALOG ───
+    let confirmCallback = null;
+    function openConfirm(title, text, cb) {
+      document.getElementById('confirmTitle').textContent = title;
+      document.getElementById('confirmText').textContent = text;
+      confirmCallback = cb;
+      document.getElementById('confirmOverlay').classList.add('open');
+      document.getElementById('confirmBtn').onclick = () => { cb(); closeConfirm(); };
+    }
+    function closeConfirm() {
+      document.getElementById('confirmOverlay').classList.remove('open');
+    }
+
+    // ─── STATS ───
+    async function loadStats() {
+      try {
+        const s = await apiRequest('GET', '/admin/stats', null, true);
+        document.getElementById('statUsers').textContent = s.total_users;
+        document.getElementById('statAdmins').textContent = `dont ${s.total_admins} admin(s)`;
+        document.getElementById('statAgencies').textContent = s.total_agencies;
+        document.getElementById('statAvailable').textContent = s.available_properties;
+        document.getElementById('statTotal').textContent = `sur ${s.total_properties} au total`;
+        document.getElementById('statSold').textContent = s.sold_properties;
+        document.getElementById('statValuation').textContent = `Valeur catalogue : ${new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(s.total_valuation)}`;
+      } catch(e) { console.error(e); }
+    }
+
+    // ─── USERS ───
+    async function loadUsers() {
+      try {
+        const users = await apiRequest('GET', '/admin/users', null, true);
+        document.getElementById('usersCount').textContent = `${users.length} utilisateur(s)`;
+
+        // Résumé dashboard
+        const recent = users.slice(0, 5);
+        document.getElementById('recentUsers').innerHTML = recent.map(u => `
+          <tr>
+            <td><strong>${u.first_name} ${u.last_name}</strong></td>
+            <td style="font-size:0.82rem;color:var(--gray-600)">${u.email}</td>
+            <td><span class="status ${u.role === 'admin' ? 'status--sold' : 'status--available'}">${u.role}</span></td>
+          </tr>
+        `).join('');
+
+        // Table complète
+        document.getElementById('usersTableBody').innerHTML = users.map(u => `
+          <tr>
+            <td style="color:var(--gray-400)">#${u.id}</td>
+            <td><strong>${u.first_name} ${u.last_name}</strong></td>
+            <td style="font-size:0.82rem">${u.email}</td>
+            <td><span class="status ${u.role === 'admin' ? 'status--sold' : 'status--available'}">${u.role}</span></td>
+            <td style="font-size:0.82rem;color:var(--gray-600)">${u.agency_name ? `${u.agency_name} — ${u.agency_city}` : '—'}</td>
+            <td style="font-size:0.78rem;color:var(--gray-400)">${new Date(u.created_at).toLocaleDateString('fr-FR')}</td>
+            <td style="display:flex;gap:6px;align-items:center">
+              <button class="role-btn" onclick="toggleRole(${u.id}, '${u.role}', '${u.first_name} ${u.last_name}')">
+                ${u.role === 'admin' ? '→ Agent' : '→ Admin'}
+              </button>
+              ${u.id !== user.id ? `<button class="danger-btn" onclick="deleteUser(${u.id}, '${u.first_name} ${u.last_name}')">Supprimer</button>` : '<span style="font-size:0.78rem;color:var(--gray-400)">(vous)</span>'}
+            </td>
+          </tr>
+        `).join('');
+      } catch(e) {
+        document.getElementById('usersTableBody').innerHTML = `<tr><td colspan="7" style="color:var(--error);text-align:center;padding:20px">${e.message}</td></tr>`;
+      }
+    }
+
+    async function deleteUser(id, name) {
+      openConfirm('Supprimer l\'utilisateur', `Supprimer "${name}" ? Cette action est irréversible.`, async () => {
+        try {
+          await apiRequest('DELETE', `/admin/users/${id}`, null, true);
+          await loadUsers();
+          await loadStats();
+        } catch(e) { alert(e.message); }
+      });
+    }
+
+    async function toggleRole(id, currentRole, name) {
+      const newRole = currentRole === 'admin' ? 'agent' : 'admin';
+      openConfirm('Modifier le rôle', `Changer le rôle de "${name}" en ${newRole} ?`, async () => {
+        try {
+          await apiRequest('PATCH', `/admin/users/${id}/role`, { role: newRole }, true);
+          await loadUsers();
+          await loadStats();
+        } catch(e) { alert(e.message); }
+      });
+    }
+
+    // ─── PROPERTIES ───
+    async function loadAllProperties() {
+      try {
+        const props = await apiRequest('GET', '/admin/properties', null, true);
+        document.getElementById('propertiesCount').textContent = `${props.length} bien(s) au total`;
+
+        // Résumé dashboard
+        const recent = props.slice(0, 5);
+        document.getElementById('recentProperties').innerHTML = recent.map(p => {
+          const st = formatStatus(p.status);
+          return `<tr>
+            <td><strong style="font-size:0.88rem">${p.title}</strong></td>
+            <td style="font-size:0.82rem;color:var(--gray-600)">${p.city}</td>
+            <td><span class="status ${st.cls}">${st.label}</span></td>
+          </tr>`;
+        }).join('');
+
+        // Table complète
+        document.getElementById('propertiesTableBody').innerHTML = props.map(p => {
+          const st = formatStatus(p.status);
+          return `<tr>
+            <td style="color:var(--gray-400)">#${p.id}</td>
+            <td style="font-size:0.85rem"><strong>${p.title}</strong></td>
+            <td>${p.city}</td>
+            <td>${formatType(p.property_type)}</td>
+            <td>${formatTransaction(p.transaction_type)}</td>
+            <td style="font-weight:600">${formatPrice(p.price, p.transaction_type)}</td>
+            <td style="font-size:0.82rem;color:var(--gray-600)">${p.agency_name || '—'}</td>
+            <td><span class="status ${st.cls}">${st.label}</span></td>
+            <td>
+              <select onchange="changePropertyStatus(${p.id}, this.value)" style="font-size:0.78rem;padding:4px 8px;border-radius:4px;border:1px solid var(--gray-200);margin-right:6px">
+                <option value="available" ${p.status==='available'?'selected':''}>Disponible</option>
+                <option value="pending" ${p.status==='pending'?'selected':''}>En cours</option>
+                <option value="sold" ${p.status==='sold'?'selected':''}>Vendu</option>
+                <option value="rented" ${p.status==='rented'?'selected':''}>Loué</option>
+              </select>
+              <button class="danger-btn" onclick="deleteProperty(${p.id}, '${p.title.replace(/'/g,"\\'")}')">Supprimer</button>
+            </td>
+          </tr>`;
+        }).join('');
+      } catch(e) {
+        document.getElementById('propertiesTableBody').innerHTML = `<tr><td colspan="9" style="color:var(--error);text-align:center;padding:20px">${e.message}</td></tr>`;
+      }
+    }
+
+    async function deleteProperty(id, title) {
+      openConfirm('Supprimer le bien', `Supprimer "${title}" ? Cette action est irréversible.`, async () => {
+        try {
+          await apiRequest('DELETE', `/properties/${id}`, null, true);
+          await loadAllProperties();
+          await loadStats();
+        } catch(e) { alert(e.message); }
+      });
+    }
+
+    async function changePropertyStatus(id, status) {
+      try {
+        await apiRequest('PATCH', `/properties/${id}/status`, { status }, true);
+        await loadAllProperties();
+        await loadStats();
+      } catch(e) { alert(e.message); }
+    }
+
+    // ─── AGENCIES ───
+    async function loadAgencies() {
+      try {
+        const agencies = await AgenciesAPI.getAll();
+        document.getElementById('agenciesCount').textContent = `${agencies.length} agence(s)`;
+        document.getElementById('agenciesTableBody').innerHTML = agencies.map(a => `
+          <tr>
+            <td style="color:var(--gray-400)">#${a.id}</td>
+            <td><strong>${a.name}</strong></td>
+            <td>${a.city}</td>
+            <td style="font-size:0.82rem;color:var(--gray-600)">${a.address || '—'}</td>
+            <td style="font-size:0.82rem">${a.phone || '—'}</td>
+            <td style="font-size:0.82rem">${a.email || '—'}</td>
+            <td><button class="danger-btn" onclick="deleteAgency(${a.id}, '${a.name.replace(/'/g,"\\'")}')">Supprimer</button></td>
+          </tr>
+        `).join('');
+      } catch(e) {
+        document.getElementById('agenciesTableBody').innerHTML = `<tr><td colspan="7" style="color:var(--error);text-align:center;padding:20px">${e.message}</td></tr>`;
+      }
+    }
+
+    async function handleAddAgency() {
+      const name = document.getElementById('aName').value.trim();
+      const city = document.getElementById('aCity').value.trim();
+      const address = document.getElementById('aAddress').value.trim();
+      const phone = document.getElementById('aPhone').value.trim();
+      const email = document.getElementById('aEmail').value.trim();
+      const errEl = document.getElementById('agencyError');
+      const succEl = document.getElementById('agencySuccess');
+      const btn = document.getElementById('agencySubmit');
+
+      errEl.classList.remove('show'); succEl.classList.remove('show');
+
+      if (!name || !city) {
+        errEl.textContent = 'Nom et ville sont obligatoires.';
+        errEl.classList.add('show'); return;
+      }
+
+      btn.textContent = 'Création…'; btn.disabled = true;
+      try {
+        await apiRequest('POST', '/agencies', { name, city, address, phone, email }, true);
+        succEl.textContent = `✓ Agence "${name}" créée !`;
+        succEl.classList.add('show');
+        ['aName','aCity','aAddress','aPhone','aEmail'].forEach(id => document.getElementById(id).value = '');
+        await loadAgencies();
+        await loadStats();
+      } catch(e) {
+        errEl.textContent = e.message; errEl.classList.add('show');
+      } finally {
+        btn.textContent = "Créer l'agence"; btn.disabled = false;
+      }
+    }
+
+    async function deleteAgency(id, name) {
+      openConfirm('Supprimer l\'agence', `Supprimer "${name}" et tous ses biens associés ?`, async () => {
+        try {
+          await apiRequest('DELETE', `/agencies/${id}`, null, true);
+          await loadAgencies();
+          await loadStats();
+        } catch(e) { alert(e.message); }
+      });
+    }
+
+    function logout() {
+      Auth.clearSession();
+      window.location.href = 'login.html';
+    }
+  </script>
+</body>
+</html>
