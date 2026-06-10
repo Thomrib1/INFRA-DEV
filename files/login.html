@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Connexion — Ymmo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="auth-page">
+
+    <!-- Visuel gauche -->
+    <div class="auth-page__visual">
+      <div class="auth-visual__logo">
+        <a href="index.html" class="logo logo--light">
+          <span class="logo__mark">Y</span>
+          <span class="logo__text">mmo</span>
+        </a>
+      </div>
+      <h2 class="auth-visual__title">L'espace<br />de votre agence.</h2>
+      <p class="auth-visual__subtitle">Gérez vos biens, suivez vos transactions et pilotez votre activité depuis un seul endroit.</p>
+    </div>
+
+    <!-- Formulaire -->
+    <div class="auth-page__form-area">
+      <div class="auth-form">
+        <div class="auth-form-header">
+          <h2>Connexion</h2>
+          <p>Bienvenue ! Connectez-vous à votre espace agent.</p>
+        </div>
+
+        <div class="alert alert--error" id="loginError"></div>
+        <div class="alert alert--success" id="loginSuccess"></div>
+
+        <div class="form-group">
+          <label for="loginEmail">Adresse email</label>
+          <input type="email" id="loginEmail" placeholder="agent@ymmo.fr" autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Mot de passe</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" />
+        </div>
+        <button class="btn btn--primary btn--full btn--lg" id="loginSubmit" onclick="handleLogin()">
+          Se connecter
+        </button>
+
+        <div class="auth-form-footer">
+          Pas encore de compte ? <a href="register.html">Créer un compte</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="api.js"></script>
+  <script src="components.js"></script>
+  <script>
+    // Redirection si déjà connecté
+    if (Auth.isLoggedIn()) window.location.href = 'dashboard.html';
+
+    async function handleLogin() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const errEl = document.getElementById('loginError');
+      const succEl = document.getElementById('loginSuccess');
+      const btn = document.getElementById('loginSubmit');
+
+      errEl.classList.remove('show');
+      succEl.classList.remove('show');
+
+      if (!email || !password) {
+        errEl.textContent = 'Veuillez remplir tous les champs.';
+        errEl.classList.add('show');
+        return;
+      }
+
+      btn.textContent = 'Connexion…';
+      btn.disabled = true;
+
+      try {
+        const data = await AuthAPI.login(email, password);
+        Auth.setSession(data.token, data.user);
+        succEl.textContent = `Bienvenue ${data.user.first_name} ! Redirection…`;
+        succEl.classList.add('show');
+        setTimeout(() => window.location.href = 'dashboard.html', 900);
+      } catch (err) {
+        errEl.textContent = err.message || 'Identifiants incorrects.';
+        errEl.classList.add('show');
+        btn.textContent = 'Se connecter';
+        btn.disabled = false;
+      }
+    }
+
+    // Entrée clavier
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleLogin();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catalogue — Ymmo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="header" id="header">
+    <div class="header__inner container">
+      <a href="index.html" class="logo">
+        <span class="logo__mark">Y</span>
+        <span class="logo__text">mmo</span>
+      </a>
+      <nav class="nav">
+        <a href="index.html" class="nav__link">Accueil</a>
+        <a href="catalogue.html" class="nav__link nav__link--active">Biens</a>
+        <a href="agences.html" class="nav__link">Agences</a>
+        <a href="index.html#contact" class="nav__link">Contact</a>
+      </nav>
+      <div class="header__actions">
+        <a href="login.html" class="btn btn--ghost" id="loginBtn">Connexion</a>
+        <a href="dashboard.html" class="btn btn--primary hidden" id="dashboardBtn">Mon espace</a>
+      </div>
+      <button class="burger" id="burger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="nav-mobile" id="navMobile">
+      <a href="index.html" class="nav__link">Accueil</a>
+      <a href="catalogue.html" class="nav__link">Catalogue</a>
+      <a href="agences.html" class="nav__link">Agences</a>
+      <a href="login.html" class="btn btn--primary">Connexion</a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="page-hero">
+    <div class="container">
+      <div class="section__eyebrow">Catalogue</div>
+      <h1 class="page-hero__title">Tous nos biens disponibles</h1>
+      <p class="page-hero__sub">Vente et location · Résidentiel et professionnel</p>
+    </div>
+  </section>
+
+  <!-- Filtres -->
+  <div class="filters-bar">
+    <div class="filters-bar__inner container">
+      <button class="filter-chip active" data-filter="transaction" data-val="">Tous</button>
+      <button class="filter-chip" data-filter="transaction" data-val="sale">Achat</button>
+      <button class="filter-chip" data-filter="transaction" data-val="rent">Location</button>
+      <span style="width:1px;height:20px;background:var(--gray-200);margin:0 4px;"></span>
+      <button class="filter-chip active" data-filter="type" data-val="">Tous types</button>
+      <button class="filter-chip" data-filter="type" data-val="house">Maisons</button>
+      <button class="filter-chip" data-filter="type" data-val="apartment">Appartements</button>
+      <button class="filter-chip" data-filter="type" data-val="office">Bureaux</button>
+      <span class="filters-count" id="filtersCount"></span>
+    </div>
+  </div>
+
+  <!-- Grille -->
+  <section class="section">
+    <div class="container">
+      <div class="properties-grid" id="catalogueGrid">
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <a href="index.html" class="logo logo--light">
+          <span class="logo__mark">Y</span><span class="logo__text">mmo</span>
+        </a>
+        <p>Votre partenaire immobilier en France depuis 2004.</p>
+      </div>
+      <div class="footer__links">
+        <div class="footer__col">
+          <h4>Navigation</h4>
+          <a href="index.html">Accueil</a>
+          <a href="catalogue.html">Catalogue</a>
+          <a href="agences.html">Agences</a>
+        </div>
+        <div class="footer__col">
+          <h4>Espace pro</h4>
+          <a href="login.html">Connexion</a>
+          <a href="dashboard.html">Dashboard</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer__bottom container">
+      <span>© 2025 Ymmo Groupe Immobilier · Tous droits réservés</span>
+    </div>
+  </footer>
+
+  <script src="api.js"></script>
+  <script src="components.js"></script>
+  <script src="catalogue.js"></script>
+</body>
+</html>
