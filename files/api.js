@@ -3,7 +3,7 @@
  * Toutes les requêtes vers le back Express (localhost:3000)
  */
 
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = 'http://10.10.99.30:3000/api';
 
 // ─── AUTH TOKEN ───
 const Auth = {
