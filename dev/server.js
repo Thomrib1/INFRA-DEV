@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const app = express();
-app.use(express.json()); // permet au serveur de comprendre le format JSON
+app.use(express.json());
 
 const cors = require('cors');
 app.use(cors({ origin: '*' }));
@@ -32,10 +32,9 @@ db.getConnection((err, connection) => {
 });
 
 // MIDDLEWARES
-// vérif JWT
 const verifyToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // format: "Bearer TOKEN"
+    const token = authHeader && authHeader.split(' ')[1];
     if (!token) return res.status(401).json({ error: "Accès refusé. Token manquant." });
     try {
         const verified = jwt.verify(token, process.env.JWT_SECRET);
@@ -46,7 +45,6 @@ const verifyToken = (req, res, next) => {
     }
 };
 
-// vérif rôle Admin (à utiliser APRÈS verifyToken)
 const verifyAdmin = (req, res, next) => {
     if (req.user.role !== 'admin') {
         return res.status(403).json({ error: "Accès refusé. Droits administrateur requis." });
@@ -55,7 +53,6 @@ const verifyAdmin = (req, res, next) => {
 };
 
 // ROUTES AGENCES
-// créer une agence (admin uniquement)
 app.post('/api/agencies', verifyToken, verifyAdmin, (req, res) => {
     const { name, city, address, phone, email } = req.body;
     const query = 'INSERT INTO agencies (name, city, address, phone, email) VALUES (?, ?, ?, ?, ?)';
@@ -65,7 +62,6 @@ app.post('/api/agencies', verifyToken, verifyAdmin, (req, res) => {
     });
 });
 
-// récup toutes les agences (public)
 app.get('/api/agencies', (req, res) => {
     db.query('SELECT * FROM agencies', (err, results) => {
         if (err) return res.status(500).json({ error: err.message });
@@ -73,7 +69,6 @@ app.get('/api/agencies', (req, res) => {
     });
 });
 
-// supp une agence (admin uniquement)
 app.delete('/api/agencies/:id', verifyToken, verifyAdmin, (req, res) => {
     db.query('DELETE FROM agencies WHERE id = ?', [req.params.id], (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
@@ -83,14 +78,11 @@ app.delete('/api/agencies/:id', verifyToken, verifyAdmin, (req, res) => {
 });
 
 // ROUTES AUTH
-// inscription
 app.post('/api/auth/register', async (req, res) => {
     const { agency_id, first_name, last_name, email, password, role } = req.body;
-
     if (!first_name || !last_name || !email || !password) {
         return res.status(400).json({ error: "Veuillez remplir tous les champs obligatoires." });
     }
-
     try {
         const saltRounds = 10;
         const passwordHash = await bcrypt.hash(password, saltRounds);
@@ -107,25 +99,20 @@ app.post('/api/auth/register', async (req, res) => {
     }
 });
 
-// connexion
 app.post('/api/auth/login', (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ error: "Veuillez fournir un email et un mot de passe." });
-
     db.query('SELECT * FROM users WHERE email = ?', [email], async (err, results) => {
         if (err) return res.status(500).json({ error: err.message });
         if (results.length === 0) return res.status(401).json({ error: "Identifiants incorrects." });
-
         const user = results[0];
         const match = await bcrypt.compare(password, user.password_hash);
         if (!match) return res.status(401).json({ error: "Identifiants incorrects." });
-
         const token = jwt.sign(
             { id: user.id, role: user.role, agency_id: user.agency_id },
             process.env.JWT_SECRET,
             { expiresIn: '24h' }
         );
-
         res.json({
             message: "Connexion réussie !",
             token,
@@ -141,6 +128,7 @@ app.post('/api/auth/login', (req, res) => {
 });
 
 // ROUTES PROPERTIES
+
 // récup tous les biens disponibles (public)
 app.get('/api/properties', (req, res) => {
     db.query('SELECT * FROM properties WHERE status = "available" ORDER BY created_at DESC', (err, results) => {
@@ -149,10 +137,23 @@ app.get('/api/properties', (req, res) => {
     });
 });
 
-// add un bien (agent connecté)
+// ★ NOUVEAU : récup uniquement les biens du user connecté
+app.get('/api/my-properties', verifyToken, (req, res) => {
+    db.query(
+        'SELECT * FROM properties WHERE user_id = ? ORDER BY created_at DESC',
+        [req.user.id],
+        (err, results) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json(results);
+        }
+    );
+});
+
+// add un bien (agent connecté) — on stocke maintenant le user_id
 app.post('/api/properties', verifyToken, (req, res) => {
     const { title, description, city, property_type, transaction_type, price, surface_area, rooms, bedrooms } = req.body;
     const agency_id = req.user.agency_id;
+    const user_id = req.user.id; // ★ NOUVEAU
 
     if (!title || !city || !property_type || !transaction_type || !price || !surface_area) {
         return res.status(400).json({ error: "Veuillez remplir tous les champs obligatoires." });
@@ -160,31 +161,26 @@ app.post('/api/properties', verifyToken, (req, res) => {
 
     const query = `
         INSERT INTO properties 
-        (agency_id, title, description, city, property_type, transaction_type, price, surface_area, rooms, bedrooms, status) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'available')
+        (agency_id, user_id, title, description, city, property_type, transaction_type, price, surface_area, rooms, bedrooms, status) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'available')
     `;
-    db.query(query, [agency_id, title, description, city, property_type, transaction_type, price, surface_area, rooms || 0, bedrooms || 0], (err, result) => {
+    db.query(query, [agency_id, user_id, title, description, city, property_type, transaction_type, price, surface_area, rooms || 0, bedrooms || 0], (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
         res.status(201).json({ message: "Bien immobilier ajouté avec succès !", propertyId: result.insertId });
     });
 });
 
-// supp un bien (admin OU agent propriétaire du bien)
+// supp un bien (admin OU propriétaire du bien)
 app.delete('/api/properties/:id', verifyToken, (req, res) => {
     const propertyId = req.params.id;
-
-    // récup le bien pour vérifier l'agence
     db.query('SELECT * FROM properties WHERE id = ?', [propertyId], (err, results) => {
         if (err) return res.status(500).json({ error: err.message });
         if (results.length === 0) return res.status(404).json({ error: "Bien introuvable." });
-
         const property = results[0];
-
-        // admin peut tous supp, agent seulement ses propres biens (même agence)
-        if (req.user.role !== 'admin' && property.agency_id !== req.user.agency_id) {
+        // admin peut tout supprimer, agent seulement ses propres biens (par user_id)
+        if (req.user.role !== 'admin' && property.user_id !== req.user.id) {
             return res.status(403).json({ error: "Vous ne pouvez pas supprimer ce bien." });
         }
-
         db.query('DELETE FROM properties WHERE id = ?', [propertyId], (err) => {
             if (err) return res.status(500).json({ error: err.message });
             res.json({ message: "Bien supprimé avec succès." });
@@ -192,23 +188,20 @@ app.delete('/api/properties/:id', verifyToken, (req, res) => {
     });
 });
 
-// modifier le statut d'un bien (admin ou agent propriétaire)
+// modifier le statut d'un bien
 app.patch('/api/properties/:id/status', verifyToken, (req, res) => {
     const { status } = req.body;
     const validStatuses = ['available', 'pending', 'sold', 'rented'];
     if (!validStatuses.includes(status)) {
         return res.status(400).json({ error: "Statut invalide." });
     }
-
     db.query('SELECT * FROM properties WHERE id = ?', [req.params.id], (err, results) => {
         if (err) return res.status(500).json({ error: err.message });
         if (results.length === 0) return res.status(404).json({ error: "Bien introuvable." });
-
         const property = results[0];
-        if (req.user.role !== 'admin' && property.agency_id !== req.user.agency_id) {
+        if (req.user.role !== 'admin' && property.user_id !== req.user.id) {
             return res.status(403).json({ error: "Action non autorisée." });
         }
-
         db.query('UPDATE properties SET status = ? WHERE id = ?', [status, req.params.id], (err) => {
             if (err) return res.status(500).json({ error: err.message });
             res.json({ message: "Statut mis à jour." });
@@ -217,34 +210,26 @@ app.patch('/api/properties/:id/status', verifyToken, (req, res) => {
 });
 
 // ROUTES ADMIN
-// stats globales
 app.get('/api/admin/stats', verifyToken, verifyAdmin, (req, res) => {
     const stats = {};
-
     db.query('SELECT COUNT(*) as total FROM users', (err, r) => {
         if (err) return res.status(500).json({ error: err.message });
         stats.total_users = r[0].total;
-
         db.query('SELECT COUNT(*) as total FROM users WHERE role = "admin"', (err, r) => {
             if (err) return res.status(500).json({ error: err.message });
             stats.total_admins = r[0].total;
-
             db.query('SELECT COUNT(*) as total FROM agencies', (err, r) => {
                 if (err) return res.status(500).json({ error: err.message });
                 stats.total_agencies = r[0].total;
-
                 db.query('SELECT COUNT(*) as total FROM properties', (err, r) => {
                     if (err) return res.status(500).json({ error: err.message });
                     stats.total_properties = r[0].total;
-
                     db.query('SELECT COUNT(*) as total FROM properties WHERE status = "available"', (err, r) => {
                         if (err) return res.status(500).json({ error: err.message });
                         stats.available_properties = r[0].total;
-
                         db.query('SELECT COUNT(*) as total FROM properties WHERE status = "sold"', (err, r) => {
                             if (err) return res.status(500).json({ error: err.message });
                             stats.sold_properties = r[0].total;
-
                             db.query('SELECT COALESCE(SUM(price), 0) as total FROM properties WHERE status = "available"', (err, r) => {
                                 if (err) return res.status(500).json({ error: err.message });
                                 stats.total_valuation = r[0].total;
@@ -258,7 +243,6 @@ app.get('/api/admin/stats', verifyToken, verifyAdmin, (req, res) => {
     });
 });
 
-// liste tous les utilisateurs (admin)
 app.get('/api/admin/users', verifyToken, verifyAdmin, (req, res) => {
     const query = `
         SELECT u.id, u.first_name, u.last_name, u.email, u.role, u.created_at,
@@ -273,7 +257,6 @@ app.get('/api/admin/users', verifyToken, verifyAdmin, (req, res) => {
     });
 });
 
-// supp un utilisateur (admin, ne peut pas se supp lui-même)
 app.delete('/api/admin/users/:id', verifyToken, verifyAdmin, (req, res) => {
     if (parseInt(req.params.id) === req.user.id) {
         return res.status(400).json({ error: "Vous ne pouvez pas supprimer votre propre compte." });
@@ -285,12 +268,10 @@ app.delete('/api/admin/users/:id', verifyToken, verifyAdmin, (req, res) => {
     });
 });
 
-// changer le rôle d'un utilisateur (admin)
 app.patch('/api/admin/users/:id/role', verifyToken, verifyAdmin, (req, res) => {
     const { role } = req.body;
     if (!['admin', 'agent'].includes(role)) return res.status(400).json({ error: "Rôle invalide." });
     if (parseInt(req.params.id) === req.user.id) return res.status(400).json({ error: "Vous ne pouvez pas modifier votre propre rôle." });
-
     db.query('UPDATE users SET role = ? WHERE id = ?', [role, req.params.id], (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
         if (result.affectedRows === 0) return res.status(404).json({ error: "Utilisateur introuvable." });
@@ -298,7 +279,6 @@ app.patch('/api/admin/users/:id/role', verifyToken, verifyAdmin, (req, res) => {
     });
 });
 
-// liste tous les biens (admin, tous statuts)
 app.get('/api/admin/properties', verifyToken, verifyAdmin, (req, res) => {
     const query = `
         SELECT p.*, a.name as agency_name, a.city as agency_city

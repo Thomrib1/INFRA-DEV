@@ -33,7 +33,7 @@ function initUserInfo() {
 
 async function loadProperties() {
   try {
-    allProperties = await PropertiesAPI.getAll();
+    allProperties = await apiRequest('GET', '/my-properties', null, true);
     renderPropertiesTable(allProperties);
     updateKPIs(allProperties);
   } catch (err) {
