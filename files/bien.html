@@ -147,6 +147,17 @@
             </aside>
           </div>
         `;
+
+        // Bloquer si propriétaire du bien
+        const currentUser = Auth.getUser();
+        if (currentUser && p.user_id === currentUser.id) {
+            document.querySelector('.contact-box__body').innerHTML = `
+                <p style="text-align:center;color:var(--gray-600);font-size:0.9rem;padding:20px 0">
+                    Vous êtes le propriétaire de ce bien.
+                </p>
+            `;
+        }
+
       } catch (err) {
         container.innerHTML = `<div style="text-align:center;padding:80px">
           <p>Bien introuvable ou serveur indisponible.</p>

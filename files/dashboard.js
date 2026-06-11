@@ -2,7 +2,7 @@
  * YMMO — Dashboard Agent
  */
 
-// Auth guard
+// auth guard
 if (!Auth.isLoggedIn()) {
   window.location.href = 'login.html';
 }
@@ -25,7 +25,7 @@ function initUserInfo() {
   document.getElementById('sidebarRole').textContent = user.role === 'admin' ? 'Administrateur' : 'Agent';
   document.getElementById('sidebarAvatar').textContent = initial;
 
-   // Afficher le lien admin uniquement si admin
+   // afficher le lien admin uniquement si admin
   if (user.role === 'admin') {
     document.getElementById('adminLink').style.display = 'flex';
   }

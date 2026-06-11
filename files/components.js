@@ -2,7 +2,7 @@
  * YMMO — Composants réutilisables
  */
 
-// ─── FORMATAGE ───
+// FORMATAGE
 function formatPrice(price, transactionType) {
   const n = parseFloat(price);
   const formatted = new Intl.NumberFormat('fr-FR', {
@@ -30,7 +30,7 @@ function formatStatus(s) {
   return map[s] || { label: s, cls: '' };
 }
 
-// ─── SVG ICONS ───
+// SVG ICONS
 const Icons = {
   home: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>`,
   building: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="1"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>`,
@@ -44,7 +44,7 @@ const Icons = {
   close: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>`,
 };
 
-// ─── PROPERTY CARD ───
+// PROPERTY CARD
 function renderPropertyCard(p) {
   const typeIcon = p.property_type === 'house' ? Icons.home : (p.property_type === 'apartment' ? Icons.building : Icons.office);
   const badgeCls = p.transaction_type === 'sale' ? 'badge--sale' : 'badge--rent';
@@ -73,7 +73,7 @@ function renderPropertyCard(p) {
   `;
 }
 
-// ─── AGENCY CARD (preview) ───
+// AGENCY CARD (preview)
 function renderAgencyCardPreview(a) {
   const initial = a.name ? a.name.charAt(0).toUpperCase() : '?';
   return `
@@ -85,7 +85,7 @@ function renderAgencyCardPreview(a) {
   `;
 }
 
-// ─── AGENCY CARD (full) ───
+// AGENCY CARD (full)
 function renderAgencyCardFull(a) {
   const initial = a.name ? a.name.charAt(0).toUpperCase() : '?';
   return `
@@ -108,7 +108,7 @@ function renderAgencyCardFull(a) {
   `;
 }
 
-// ─── HEADER DYNAMIQUE ───
+// HEADER DYNAMIQUE
 function initHeader() {
   // Scroll effect
   window.addEventListener('scroll', () => {
@@ -131,7 +131,7 @@ function initHeader() {
   }
 }
 
-// ─── COUNTER ANIMATION ───
+// COUNTER ANIMATION
 function animateCounters() {
   const counters = document.querySelectorAll('.stat__number[data-target]');
   const observer = new IntersectionObserver((entries) => {
@@ -154,12 +154,12 @@ function animateCounters() {
   counters.forEach(c => observer.observe(c));
 }
 
-// ─── NAVIGATION VERS FICHE BIEN ───
+// NAVIGATION VERS FICHE BIEN
 function viewProperty(id) {
   window.location.href = `bien.html?id=${id}`;
 }
 
-// ─── RECHERCHE ───
+// RECHERCHE
 function doSearch() {
   const city = document.getElementById('searchCity')?.value || '';
   const type = document.getElementById('searchType')?.value || '';
@@ -171,7 +171,7 @@ function doSearch() {
   window.location.href = `catalogue.html?${params.toString()}`;
 }
 
-// ─── CONTACT FORM (sans endpoint dédié, affiche confirmation) ───
+// CONTACT FORM (sans endpoint dédié, affiche confirmation)
 function submitContact() {
   const name = document.getElementById('cName')?.value?.trim();
   const email = document.getElementById('cEmail')?.value?.trim();
@@ -183,7 +183,7 @@ function submitContact() {
     if (notice) { notice.textContent = 'Veuillez remplir les champs obligatoires.'; notice.className = 'form-notice form-notice--error'; }
     return;
   }
-  // En prod : POST /api/contact ou table contact_requests via propriété
+  // en prod : POST /api/contact ou table contact_requests via propriété
   if (notice) {
     notice.textContent = '✓ Message envoyé ! Notre équipe vous répondra dans les 24h.';
     notice.className = 'form-notice form-notice--success';
@@ -194,7 +194,7 @@ function submitContact() {
   });
 }
 
-// Init global
+// init global
 document.addEventListener('DOMContentLoaded', () => {
   initHeader();
   animateCounters();

@@ -5,7 +5,7 @@
 
 const API_BASE = `http://${window.location.hostname}:3000/api`;
 
-// ─── AUTH TOKEN ───
+// AUTH TOKEN
 const Auth = {
   getToken: () => localStorage.getItem('ymmo_token'),
   getUser: () => {
@@ -23,7 +23,7 @@ const Auth = {
   isLoggedIn: () => !!localStorage.getItem('ymmo_token'),
 };
 
-// ─── REQUÊTE GÉNÉRIQUE ───
+// REQUÊTE GÉNÉRIQUE
 async function apiRequest(method, endpoint, body = null, auth = false) {
   const headers = { 'Content-Type': 'application/json' };
   if (auth) {
@@ -39,13 +39,13 @@ async function apiRequest(method, endpoint, body = null, auth = false) {
   return data;
 }
 
-// ─── AGENCES ───
+// AGENCES
 const AgenciesAPI = {
   getAll: () => apiRequest('GET', '/agencies'),
   create: (payload) => apiRequest('POST', '/agencies', payload, true),
 };
 
-// ─── AUTH ───
+// AUTH
 const AuthAPI = {
   login: (email, password) =>
     apiRequest('POST', '/auth/login', { email, password }),
@@ -53,7 +53,7 @@ const AuthAPI = {
     apiRequest('POST', '/auth/register', payload),
 };
 
-// ─── PROPERTIES ───
+// PROPERTIES
 const PropertiesAPI = {
   getAll: () => apiRequest('GET', '/properties'),
   create: (payload) => apiRequest('POST', '/properties', payload, true),

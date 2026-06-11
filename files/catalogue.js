@@ -5,13 +5,13 @@ let allProperties = [];
 let activeFilters = { transaction: '', type: '' };
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Lire params URL (depuis search bar homepage)
+  //lire params URL (depuis search bar homepage)
   const params = new URLSearchParams(window.location.search);
   if (params.get('city')) activeFilters.city = params.get('city');
   if (params.get('type')) activeFilters.type = params.get('type');
   if (params.get('transaction')) activeFilters.transaction = params.get('transaction');
 
-  // Mettre à jour les chips actives selon les params
+  // mettre à jour les chips actives selon les params
   syncChipsFromFilters();
 
   await loadProperties();
