@@ -156,7 +156,7 @@ function animateCounters() {
 
 // ─── NAVIGATION VERS FICHE BIEN ───
 function viewProperty(id) {
-  window.location.href = `bien.html?id=${id}`;
+  window.location.href = `/bien.html?id=${id}`;
 }
 
 // ─── RECHERCHE ───
