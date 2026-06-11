@@ -24,6 +24,11 @@ function initUserInfo() {
   document.getElementById('sidebarName').textContent = name;
   document.getElementById('sidebarRole').textContent = user.role === 'admin' ? 'Administrateur' : 'Agent';
   document.getElementById('sidebarAvatar').textContent = initial;
+
+   // Afficher le lien admin uniquement si admin
+  if (user.role === 'admin') {
+    document.getElementById('adminLink').style.display = 'flex';
+  }
 }
 
 async function loadProperties() {
