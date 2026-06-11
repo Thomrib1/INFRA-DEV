@@ -5,7 +5,6 @@
 // ─── FORMATAGE ───
 function formatPrice(price, transactionType) {
   const n = parseFloat(price);
-  if (isNaN(n) || n < 0) return 'Prix non renseigné';
   const formatted = new Intl.NumberFormat('fr-FR', {
     style: 'currency', currency: 'EUR', maximumFractionDigits: 0
   }).format(n);
