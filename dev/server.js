@@ -198,17 +198,47 @@ app.patch('/api/properties/:id/status', verifyToken, (req, res) => {
     if (!validStatuses.includes(status)) {
         return res.status(400).json({ error: "Statut invalide." });
     }
+
     db.query('SELECT * FROM properties WHERE id = ?', [req.params.id], (err, results) => {
         if (err) return res.status(500).json({ error: err.message });
         if (results.length === 0) return res.status(404).json({ error: "Bien introuvable." });
+
         const property = results[0];
         if (req.user.role !== 'admin' && property.user_id !== req.user.id) {
             return res.status(403).json({ error: "Action non autorisée." });
         }
+
         db.query('UPDATE properties SET status = ? WHERE id = ?', [status, req.params.id], (err) => {
             if (err) return res.status(500).json({ error: err.message });
+
+            // Si le bien est vendu ou loué → enregistrer la transaction
+            if (status === 'sold' || status === 'rented') {
+                const transactionQuery = `
+                    INSERT INTO transactions (property_id, agent_id, final_price, sold_at)
+                    VALUES (?, ?, ?, NOW())
+                `;
+                db.query(transactionQuery, [property.id, req.user.id, property.price], (err) => {
+                    if (err) console.error("Erreur transaction :", err.message);
+                });
+            }
+
             res.json({ message: "Statut mis à jour." });
         });
+    });
+});
+
+// ROUTE CONTACT REQUESTS
+app.post('/api/contact_requests', (req, res) => {
+    const { property_id, full_name, email, phone, message } = req.body;
+
+    if (!full_name || !email || !message) {
+        return res.status(400).json({ error: "Veuillez remplir tous les champs obligatoires." });
+    }
+
+    const query = 'INSERT INTO contact_requests (property_id, full_name, email, phone, message) VALUES (?, ?, ?, ?, ?)';
+    db.query(query, [property_id, full_name, email, phone, message], (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.status(201).json({ message: "Demande enregistrée avec succès !" });
     });
 });
 

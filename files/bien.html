@@ -155,23 +155,37 @@
       }
     });
 
-    function submitPropertyContact(propertyId) {
-      const name = document.getElementById('cboxName')?.value?.trim();
-      const email = document.getElementById('cboxEmail')?.value?.trim();
-      const phone = document.getElementById('cboxPhone')?.value?.trim();
-      const message = document.getElementById('cboxMessage')?.value?.trim();
-      const notice = document.getElementById('cboxNotice');
+async function submitPropertyContact(propertyId) {
+    const name = document.getElementById('cboxName')?.value?.trim();
+    const email = document.getElementById('cboxEmail')?.value?.trim();
+    const phone = document.getElementById('cboxPhone')?.value?.trim();
+    const message = document.getElementById('cboxMessage')?.value?.trim();
+    const notice = document.getElementById('cboxNotice');
 
-      if (!name || !email || !message) {
+    if (!name || !email || !message) {
         if (notice) { notice.textContent = 'Veuillez remplir les champs obligatoires.'; notice.style.color = 'var(--error)'; }
         return;
-      }
-      // En prod : POST /api/contact_requests avec { property_id, full_name, email, phone, message }
-      if (notice) {
-        notice.textContent = '✓ Demande envoyée ! Un agent vous contacte sous 24h.';
-        notice.style.color = 'var(--success)';
-      }
     }
+
+    try {
+        await apiRequest('POST', '/contact_requests', {
+            property_id: propertyId,
+            full_name: name,
+            email: email,
+            phone: phone,
+            message: message
+        });
+        if (notice) {
+            notice.textContent = '✓ Demande envoyée ! Un agent vous contacte sous 24h.';
+            notice.style.color = 'var(--success)';
+        }
+    } catch (err) {
+        if (notice) {
+            notice.textContent = 'Erreur lors de l\'envoi. Réessayez.';
+            notice.style.color = 'var(--error)';
+        }
+    }
+}
   </script>
 </body>
 </html>
