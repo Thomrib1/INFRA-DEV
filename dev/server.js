@@ -10,6 +10,9 @@ app.use(express.json());
 const cors = require('cors');
 app.use(cors({ origin: '*' }));
 
+const path = require('path');
+app.use(express.static(path.join(__dirname, '../files')));
+
 // connexion à la DB
 const db = mysql.createPool({
     host: process.env.DB_HOST,
